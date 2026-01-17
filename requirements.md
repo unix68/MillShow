@@ -10,4 +10,13 @@ For each question the following happens:
 - The team captain discusses with his team members and then clicks the answer (A/B/C/D) they decided upon.
 - Game master locks the question and reveals the right answer.
 - Application shows points achieved by each team
+Application will only be used ONCE. So no need to make it highly adaptable.
+App layout/style of the buttons should be similar to the original TV show.
+
+# Functional
+use python and javascript as preferred languages
+app shall use azure technologies
+no login, no user accounts - very simple - just URL based (e.g. hidden admin URL)
+data is loaded from json files or is part of code file
+
 

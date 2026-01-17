@@ -207,6 +207,16 @@ body {
     box-shadow: 0 0 10px var(--gold);
 }
 
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
 .btn-danger {
     background: linear-gradient(135deg, #cc0000, #990000);
 }

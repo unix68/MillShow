@@ -1,0 +1,37 @@
+{
+  "questions": [
+    {
+      "question": "Sample question 1 - Replace with your question",
+      "answers": {
+        "A": "First answer option",
+        "B": "Second answer option",
+        "C": "Third answer option",
+        "D": "Fourth answer option"
+      },
+      "correct": "A",
+      "points": 100
+    },
+    {
+      "question": "Sample question 2 - Replace with your question",
+      "answers": {
+        "A": "First answer option",
+        "B": "Second answer option",
+        "C": "Third answer option",
+        "D": "Fourth answer option"
+      },
+      "correct": "B",
+      "points": 200
+    },
+    {
+      "question": "Sample question 3 - Replace with your question",
+      "answers": {
+        "A": "First answer option",
+        "B": "Second answer option",
+        "C": "Third answer option",
+        "D": "Fourth answer option"
+      },
+      "correct": "C",
+      "points": 500
+    }
+  ]
+}

@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, session, send_file
 from flask_cors import CORS
+from werkzeug.utils import secure_filename
 import json
 import os
 from datetime import datetime
@@ -23,6 +24,12 @@ def load_questions():
     questions_file = os.path.join(os.path.dirname(__file__), 'questions.json')
     with open(questions_file, 'r', encoding='utf-8') as f:
         return json.load(f)
+
+def save_questions(data):
+    """Save questions to JSON file"""
+    questions_file = os.path.join(os.path.dirname(__file__), 'questions.json')
+    with open(questions_file, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
 
 questions_data = load_questions()
 
@@ -139,6 +146,74 @@ def submit_answer():
     game_state['teams'][team_number]['answers'][game_state['current_question']] = answer
     
     return jsonify({'success': True})
+
+@app.route('/api/admin/upload-questions', methods=['POST'])
+def upload_questions():
+    """Upload new questions JSON file"""
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+    
+    file = request.files['file']
+    
+    if file.filename == '':
+        return jsonify({'error': 'No file selected'}), 400
+    
+    if not file.filename.endswith('.json'):
+        return jsonify({'error': 'File must be a JSON file'}), 400
+    
+    try:
+        # Parse and validate JSON
+        content = file.read().decode('utf-8')
+        new_questions = json.loads(content)
+        
+        # Validate structure
+        if 'questions' not in new_questions:
+            return jsonify({'error': 'Invalid format: missing "questions" key'}), 400
+        
+        if not isinstance(new_questions['questions'], list):
+            return jsonify({'error': 'Invalid format: "questions" must be an array'}), 400
+        
+        # Validate each question
+        for i, q in enumerate(new_questions['questions']):
+            required_keys = ['question', 'answers', 'correct', 'points']
+            for key in required_keys:
+                if key not in q:
+                    return jsonify({'error': f'Question {i+1} missing required key: {key}'}), 400
+            
+            if not all(opt in q['answers'] for opt in ['A', 'B', 'C', 'D']):
+                return jsonify({'error': f'Question {i+1} must have answers A, B, C, D'}), 400
+            
+            if q['correct'] not in ['A', 'B', 'C', 'D']:
+                return jsonify({'error': f'Question {i+1} has invalid correct answer'}), 400
+        
+        # Save the new questions
+        save_questions(new_questions)
+        
+        # Reload questions in memory
+        global questions_data
+        questions_data = new_questions
+        
+        # Reset game state
+        game_state['current_question'] = None
+        game_state['question_enabled'] = False
+        game_state['question_locked'] = False
+        game_state['correct_answer'] = None
+        
+        return jsonify({
+            'success': True, 
+            'message': f'Successfully uploaded {len(new_questions["questions"])} questions'
+        })
+        
+    except json.JSONDecodeError as e:
+        return jsonify({'error': f'Invalid JSON format: {str(e)}'}), 400
+    except Exception as e:
+        return jsonify({'error': f'Error processing file: {str(e)}'}), 500
+
+@app.route('/api/admin/download-questions')
+def download_questions():
+    """Download current questions JSON file"""
+    questions_file = os.path.join(os.path.dirname(__file__), 'questions.json')
+    return send_file(questions_file, as_attachment=True, download_name='questions.json')
 
 @app.route('/api/scoreboard')
 def get_scoreboard():

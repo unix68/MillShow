@@ -67,6 +67,12 @@ Edit `config.py` to customize:
 
 ## Game Questions
 
+### Editing Questions
+
+You have two options to manage questions:
+
+#### Option 1: Edit questions.json directly
+
 Edit `questions.json` to customize your questions. Format:
 ```json
 {
@@ -86,6 +92,18 @@ Edit `questions.json` to customize your questions. Format:
 }
 ```
 
+A template file `questions-template.json` is provided as a starting point.
+
+#### Option 2: Upload via Admin Panel
+
+1. Open the admin panel
+2. Click "📤 Upload Questions" button
+3. Select your JSON file (must follow the format above)
+4. The file will be validated and loaded immediately
+5. You can also download the current questions using "📥 Download Questions"
+
+**Note**: Uploading new questions will automatically reset the game state.
+
 ## How to Play
 
 1. **Setup**: Game master opens admin panel, teams open their team views
@@ -99,16 +117,20 @@ Edit `questions.json` to customize your questions. Format:
 
 ```
 MillShow/
-├── app.py              # Main Flask application
-├── config.py           # Configuration settings
-├── questions.json      # Game questions
-├── requirements.txt    # Python dependencies
+├── app.py                    # Main Flask application
+├── config.py                 # Configuration settings
+├── questions.json            # Current game questions
+├── questions-template.json   # Template for creating custom questions
+├── requirements.txt          # Python dependencies
+├── requirements-prod.txt     # Production dependencies
+├── startup.sh                # Azure startup script
+├── Procfile                  # Deployment configuration
 ├── static/
-│   └── style.css      # Millionaire-themed styles
+│   └── style.css            # Millionaire-themed styles
 └── templates/
-    ├── index.html     # Team selection page
-    ├── team.html      # Team game view
-    └── admin.html     # Game master control panel
+    ├── index.html           # Team selection page
+    ├── team.html            # Team game view
+    └── admin.html           # Game master control panel
 ```
 
 ## Technology Stack
