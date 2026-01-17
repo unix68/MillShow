@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team {{ team_number }} - Game View</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center; color: #ffd700; margin: 20px 0;">Team {{ team_number }}</h1>
+        
+        <div id="gameView">
+            <div class="waiting-screen">
+                <h2>Waiting for question...</h2>
+                <div class="loader"></div>
+            </div>
+        </div>
+
+        <div class="scoreboard" id="scoreboard" style="display: none;">
+            <h2>🏆 Scoreboard 🏆</h2>
+            <div id="scoreList"></div>
+        </div>
+    </div>
+
+    <script>
+        const teamNumber = {{ team_number }};
+        let selectedAnswer = null;
+
+        async function fetchGameState() {
+            try {
+                const response = await fetch('/api/game-state');
+                const data = await response.json();
+                updateGameView(data);
+            } catch (error) {
+                console.error('Error fetching game state:', error);
+            }
+        }
+
+        async function fetchScoreboard() {
+            try {
+                const response = await fetch('/api/scoreboard');
+                const data = await response.json();
+                updateScoreboard(data.scoreboard);
+            } catch (error) {
+                console.error('Error fetching scoreboard:', error);
+            }
+        }
+
+        function updateGameView(state) {
+            const gameView = document.getElementById('gameView');
+            
+            if (!state.question_enabled || !state.question_data) {
+                gameView.innerHTML = `
+                    <div class="waiting-screen">
+                        <h2>Waiting for question...</h2>
+                        <div class="loader"></div>
+                    </div>
+                `;
+                document.getElementById('scoreboard').style.display = 'block';
+                fetchScoreboard();
+                return;
+            }
+
+            const question = state.question_data;
+            let answersHTML = '';
+
+            ['A', 'B', 'C', 'D'].forEach(option => {
+                let className = 'answer-button';
+                let disabled = state.question_locked;
+                
+                if (selectedAnswer === option) {
+                    className += ' selected';
+                }
+                
+                if (state.question_locked && state.correct_answer === option) {
+                    className += ' correct';
+                } else if (state.question_locked && selectedAnswer === option && selectedAnswer !== state.correct_answer) {
+                    className += ' incorrect';
+                }
+
+                answersHTML += `
+                    <button class="${className}" 
+                            onclick="selectAnswer('${option}')" 
+                            ${disabled ? 'disabled' : ''}>
+                        <strong>${option}:</strong> ${question.answers[option]}
+                    </button>
+                `;
+            });
+
+            gameView.innerHTML = `
+                <div class="question-container">
+                    <div class="question-text">${question.question}</div>
+                    <div class="answers-grid">
+                        ${answersHTML}
+                    </div>
+                    ${state.question_locked ? `
+                        <div style="text-align: center; margin-top: 20px; font-size: 1.5em; color: #ffd700;">
+                            Correct Answer: ${state.correct_answer}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+            if (state.question_locked) {
+                document.getElementById('scoreboard').style.display = 'block';
+                fetchScoreboard();
+            }
+        }
+
+        function updateScoreboard(scoreboard) {
+            const scoreList = document.getElementById('scoreList');
+            scoreList.innerHTML = scoreboard.map((team, index) => {
+                const isCurrentTeam = team.team_number === teamNumber;
+                return `
+                    <div class="score-item ${isCurrentTeam ? 'highlight' : ''}">
+                        <span>${index + 1}. ${team.name}</span>
+                        <span>${team.score} points</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function selectAnswer(answer) {
+            selectedAnswer = answer;
+            
+            try {
+                await fetch('/api/team/submit-answer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        team_number: teamNumber,
+                        answer: answer
+                    })
+                });
+                
+                await fetchGameState();
+            } catch (error) {
+                console.error('Error submitting answer:', error);
+            }
+        }
+
+        // Poll for updates every second
+        setInterval(fetchGameState, 1000);
+        fetchGameState();
+    </script>
+</body>
+</html>

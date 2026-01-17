@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Game Master</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container admin-panel">
+        <div class="admin-header">
+            <h1>🎮 Game Master Control Panel 🎮</h1>
+        </div>
+
+        <div class="scoreboard">
+            <h2>🏆 Live Scoreboard 🏆</h2>
+            <div id="adminScoreboard"></div>
+        </div>
+
+        <div class="questions-list">
+            <h2 style="color: #ffd700; margin-bottom: 20px;">Questions</h2>
+            <div id="questionsList"></div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="btn btn-danger" onclick="resetGame()">🔄 Reset Game</button>
+        </div>
+
+        <div class="question-container" id="currentQuestionView" style="display: none;">
+            <h3 style="color: #ffd700; text-align: center;">Current Question</h3>
+            <div id="currentQuestionContent"></div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-danger" onclick="lockQuestion()">🔒 Lock & Reveal Answer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = {{ questions | tojson }};
+        let currentState = null;
+
+        async function fetchAdminState() {
+            try {
+                const response = await fetch('/api/admin/game-state');
+                currentState = await response.json();
+                updateAdminView();
+                updateScoreboard();
+            } catch (error) {
+                console.error('Error fetching admin state:', error);
+            }
+        }
+
+        function updateAdminView() {
+            renderQuestionsList();
+            renderCurrentQuestion();
+        }
+
+        function renderQuestionsList() {
+            const list = document.getElementById('questionsList');
+            list.innerHTML = questions.map((q, index) => {
+                let status = '';
+                if (currentState.current_question === index) {
+                    if (currentState.question_locked) {
+                        status = '<span class="status-indicator status-locked">LOCKED</span>';
+                    } else if (currentState.question_enabled) {
+                        status = '<span class="status-indicator status-enabled">ACTIVE</span>';
+                    }
+                }
+
+                return `
+                    <div class="question-item">
+                        <div>
+                            <strong>Q${index + 1}:</strong> ${q.question} 
+                            (${q.points} points)
+                            ${status}
+                        </div>
+                        <button class="btn" onclick="enableQuestion(${index})"
+                                ${currentState.question_enabled && !currentState.question_locked ? 'disabled' : ''}>
+                            Enable
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderCurrentQuestion() {
+            const view = document.getElementById('currentQuestionView');
+            const content = document.getElementById('currentQuestionContent');
+
+            if (currentState.current_question === null || currentState.question_locked) {
+                view.style.display = 'none';
+                return;
+            }
+
+            view.style.display = 'block';
+            const q = questions[currentState.current_question];
+            
+            content.innerHTML = `
+                <div class="question-text">${q.question}</div>
+                <div class="answers-grid">
+                    ${['A', 'B', 'C', 'D'].map(opt => `
+                        <div class="answer-button ${q.correct === opt ? 'correct' : ''}">
+                            <strong>${opt}:</strong> ${q.answers[opt]}
+                            ${q.correct === opt ? ' ✓' : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        async function updateScoreboard() {
+            try {
+                const response = await fetch('/api/scoreboard');
+                const data = await response.json();
+                const scoreboard = document.getElementById('adminScoreboard');
+                
+                if (data.scoreboard.length === 0) {
+                    scoreboard.innerHTML = '<p style="text-align: center;">No teams yet</p>';
+                    return;
+                }
+
+                scoreboard.innerHTML = data.scoreboard.map((team, index) => `
+                    <div class="score-item">
+                        <span>${index + 1}. ${team.name}</span>
+                        <span>${team.score} points</span>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error fetching scoreboard:', error);
+            }
+        }
+
+        async function enableQuestion(index) {
+            try {
+                await fetch('/api/admin/enable-question', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question_index: index })
+                });
+                await fetchAdminState();
+            } catch (error) {
+                console.error('Error enabling question:', error);
+            }
+        }
+
+        async function lockQuestion() {
+            try {
+                await fetch('/api/admin/lock-question', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                await fetchAdminState();
+            } catch (error) {
+                console.error('Error locking question:', error);
+            }
+        }
+
+        async function resetGame() {
+            if (!confirm('Are you sure you want to reset the entire game?')) {
+                return;
+            }
+
+            try {
+                await fetch('/api/admin/reset-game', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                await fetchAdminState();
+            } catch (error) {
+                console.error('Error resetting game:', error);
+            }
+        }
+
+        // Poll for updates every second
+        setInterval(fetchAdminState, 1000);
+        fetchAdminState();
+    </script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+{
+  "questions": [
+    {
+      "question": "What is the capital of France?",
+      "answers": {
+        "A": "London",
+        "B": "Berlin",
+        "C": "Paris",
+        "D": "Madrid"
+      },
+      "correct": "C",
+      "points": 100
+    },
+    {
+      "question": "Which planet is known as the Red Planet?",
+      "answers": {
+        "A": "Venus",
+        "B": "Mars",
+        "C": "Jupiter",
+        "D": "Saturn"
+      },
+      "correct": "B",
+      "points": 200
+    },
+    {
+      "question": "Who wrote 'Romeo and Juliet'?",
+      "answers": {
+        "A": "Charles Dickens",
+        "B": "Mark Twain",
+        "C": "William Shakespeare",
+        "D": "Jane Austen"
+      },
+      "correct": "C",
+      "points": 300
+    },
+    {
+      "question": "What is the largest ocean on Earth?",
+      "answers": {
+        "A": "Atlantic Ocean",
+        "B": "Indian Ocean",
+        "C": "Arctic Ocean",
+        "D": "Pacific Ocean"
+      },
+      "correct": "D",
+      "points": 500
+    },
+    {
+      "question": "In which year did World War II end?",
+      "answers": {
+        "A": "1943",
+        "B": "1944",
+        "C": "1945",
+        "D": "1946"
+      },
+      "correct": "C",
+      "points": 1000
+    },
+    {
+      "question": "What is the chemical symbol for gold?",
+      "answers": {
+        "A": "Go",
+        "B": "Au",
+        "C": "Gd",
+        "D": "Ag"
+      },
+      "correct": "B",
+      "points": 2000
+    },
+    {
+      "question": "Which country is home to the kangaroo?",
+      "answers": {
+        "A": "New Zealand",
+        "B": "South Africa",
+        "C": "Australia",
+        "D": "Brazil"
+      },
+      "correct": "C",
+      "points": 4000
+    },
+    {
+      "question": "What is the speed of light in vacuum (approximately)?",
+      "answers": {
+        "A": "300,000 km/s",
+        "B": "150,000 km/s",
+        "C": "500,000 km/s",
+        "D": "100,000 km/s"
+      },
+      "correct": "A",
+      "points": 8000
+    },
+    {
+      "question": "Who painted the Mona Lisa?",
+      "answers": {
+        "A": "Vincent van Gogh",
+        "B": "Pablo Picasso",
+        "C": "Leonardo da Vinci",
+        "D": "Michelangelo"
+      },
+      "correct": "C",
+      "points": 16000
+    },
+    {
+      "question": "What is the smallest country in the world?",
+      "answers": {
+        "A": "Monaco",
+        "B": "Vatican City",
+        "C": "San Marino",
+        "D": "Liechtenstein"
+      },
+      "correct": "B",
+      "points": 32000
+    },
+    {
+      "question": "Which element has the atomic number 1?",
+      "answers": {
+        "A": "Helium",
+        "B": "Hydrogen",
+        "C": "Oxygen",
+        "D": "Carbon"
+      },
+      "correct": "B",
+      "points": 64000
+    },
+    {
+      "question": "In Greek mythology, who is the god of the sea?",
+      "answers": {
+        "A": "Zeus",
+        "B": "Hades",
+        "C": "Apollo",
+        "D": "Poseidon"
+      },
+      "correct": "D",
+      "points": 125000
+    },
+    {
+      "question": "What is the longest river in the world?",
+      "answers": {
+        "A": "Amazon River",
+        "B": "Nile River",
+        "C": "Yangtze River",
+        "D": "Mississippi River"
+      },
+      "correct": "B",
+      "points": 250000
+    },
+    {
+      "question": "Who developed the theory of relativity?",
+      "answers": {
+        "A": "Isaac Newton",
+        "B": "Niels Bohr",
+        "C": "Albert Einstein",
+        "D": "Stephen Hawking"
+      },
+      "correct": "C",
+      "points": 500000
+    },
+    {
+      "question": "What is the hardest natural substance on Earth?",
+      "answers": {
+        "A": "Gold",
+        "B": "Iron",
+        "C": "Diamond",
+        "D": "Platinum"
+      },
+      "correct": "C",
+      "points": 1000000
+    }
+  ]
+}
